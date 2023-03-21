@@ -1,36 +1,38 @@
 package com.SeeTax.entity.PersonalAccount;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Fees {
     
-    /* @JsonProperty("priorityServices")
-    private FeesServices priorityServices;
+    @JsonProperty("priorityServices")
+    private List<FeesServices> priorityServices;
     
     @JsonProperty("otherServices")
-    private FeesServices otherServices; */
+    private List<FeesServices> otherServices;
 
-    /* public Fees(FeesServices priorityServices, FeesServices otherServices) {
+    public Fees(List<FeesServices> priorityServices, List<FeesServices> otherServices) {
         this.priorityServices = priorityServices;
         this.otherServices = otherServices;
-    } */
+    }
 
     public Fees() {}
 
-    /* public FeesServices getPriorityServices() {
+    public List<FeesServices> getPriorityServices() {
         return priorityServices;
     }
 
-    public void setPriorityServices(FeesServices priorityServices) {
+    public void setPriorityServices(List<FeesServices> priorityServices) {
         this.priorityServices = priorityServices;
     }
 
-    public FeesServices getOtherServices() {
+    public List<FeesServices> getOtherServices() {
         return otherServices;
     }
 
-    public void setOtherServices(FeesServices otherServices) {
+    public void setOtherServices(List<FeesServices> otherServices) {
         this.otherServices = otherServices;
-    } */
+    }
 
 }

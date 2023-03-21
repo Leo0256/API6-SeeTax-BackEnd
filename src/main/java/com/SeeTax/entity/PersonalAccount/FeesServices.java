@@ -1,5 +1,7 @@
 package com.SeeTax.entity.PersonalAccount;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class FeesServices {
@@ -14,7 +16,7 @@ public class FeesServices {
     private String chargingTriggerInfo;
     
     @JsonProperty("prices")
-    private Prices prices;
+    private List<Prices> prices;
     
     @JsonProperty("minimum")
     private MinMax minimum;
@@ -24,7 +26,7 @@ public class FeesServices {
     
     public FeesServices(
             String name, String code, String chargingTriggerInfo,
-            Prices prices, MinMax minimum, MinMax maximum
+            List<Prices> prices, MinMax minimum, MinMax maximum
         ) {
         this.name = name;
         this.code = code;
@@ -60,11 +62,11 @@ public class FeesServices {
         this.chargingTriggerInfo = chargingTriggerInfo;
     }
 
-    public Prices getPrices() {
+    public List<Prices> getPrices() {
         return prices;
     }
 
-    public void setPrices(Prices prices) {
+    public void setPrices(List<Prices> prices) {
         this.prices = prices;
     }
 

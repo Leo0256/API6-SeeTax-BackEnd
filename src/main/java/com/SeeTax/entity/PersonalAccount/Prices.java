@@ -2,8 +2,6 @@ package com.SeeTax.entity.PersonalAccount;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.micrometer.common.lang.Nullable;
-
 public class Prices {
 
     @JsonProperty("interval")
@@ -21,7 +19,7 @@ public class Prices {
     @JsonProperty("customers")
     private Customers customers;
 
-    public Prices(String interval, @Nullable String value, @Nullable String monthlyFee, String currency, Customers customers) {
+    public Prices(String interval, String value, String monthlyFee, String currency, Customers customers) {
         this.interval = interval;
         this.value = value;
         this.monthlyFee = monthlyFee;

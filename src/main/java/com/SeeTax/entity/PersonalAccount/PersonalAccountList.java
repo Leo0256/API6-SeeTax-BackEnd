@@ -4,13 +4,13 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class PersonalAccounts {
+public class PersonalAccountList {
     
     @JsonProperty("type")
     private String type;
     
-    /* @JsonProperty("fees")
-    private Fees fees; */
+    @JsonProperty("fees")
+    private Fees fees;
     
     @JsonProperty("serviceBundles")
     private List<ServiceBundles> serviceBundles;
@@ -30,12 +30,12 @@ public class PersonalAccounts {
     @JsonProperty("incomeRate")
     private IncomeRate incomeRate;
 
-    public PersonalAccounts(
-            String type, /* Fees fees, */ List<ServiceBundles> serviceBundles,
+    public PersonalAccountList(
+            String type, Fees fees, List<ServiceBundles> serviceBundles,
             List<String> openingClosingChannels, String additionalInfo, List<String> transactionMethods,
             TermsConditions termsConditions, IncomeRate incomeRate) {
         this.type = type;
-        /* this.fees = fees; */
+        this.fees = fees;
         this.serviceBundles = serviceBundles;
         this.openingClosingChannels = openingClosingChannels;
         this.additionalInfo = additionalInfo;
@@ -44,7 +44,7 @@ public class PersonalAccounts {
         this.incomeRate = incomeRate;
     }
 
-    public PersonalAccounts() {}
+    public PersonalAccountList() {}
 
     public String getType() {
         return type;
@@ -54,13 +54,13 @@ public class PersonalAccounts {
         this.type = type;
     }
 
-    /* public Fees getFees() {
+    public Fees getFees() {
         return fees;
     }
 
     public void setFees(Fees fees) {
         this.fees = fees;
-    } */
+    }
 
     public List<ServiceBundles> getServiceBundles() {
         return serviceBundles;

@@ -16,10 +16,10 @@ public class Companies {
     private String urlComplementaryList;
     
     @JsonProperty("personalAccounts")
-    private List<PersonalAccounts> personalAccounts;
+    private List<PersonalAccountList> personalAccounts;
 
     public Companies(String name, String cnpjNumber, String urlComplementaryList,
-            List<PersonalAccounts> personalAccounts) {
+            List<PersonalAccountList> personalAccounts) {
         this.name = name;
         this.cnpjNumber = cnpjNumber;
         this.urlComplementaryList = urlComplementaryList;
@@ -52,11 +52,11 @@ public class Companies {
         this.urlComplementaryList = urlComplementaryList;
     }
 
-    public List<PersonalAccounts> getPersonalAccounts() {
+    public List<PersonalAccountList> getPersonalAccounts() {
         return personalAccounts;
     }
 
-    public void setPersonalAccounts(List<PersonalAccounts> personalAccounts) {
+    public void setPersonalAccounts(List<PersonalAccountList> personalAccounts) {
         this.personalAccounts = personalAccounts;
     }
 }
