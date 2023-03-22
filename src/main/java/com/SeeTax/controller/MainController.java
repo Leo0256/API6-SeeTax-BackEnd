@@ -1,5 +1,7 @@
 package com.SeeTax.controller;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,6 +22,16 @@ public class MainController {
     @GetMapping(value = "/personal-accounts")
     public String get() {
         return service.getPersonalAccount();
+    }
+
+    @GetMapping(value = "/ranking")
+    public String getRanking() {
+        try {
+            return service.getRanking();
+        }
+        catch(IOException e) {
+            return e.toString();
+        }
     }
 
 }
