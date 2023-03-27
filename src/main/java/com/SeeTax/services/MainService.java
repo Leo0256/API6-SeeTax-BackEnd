@@ -130,7 +130,7 @@ public class MainService {
                 // Total de itens
                 int length = dataList.size();
 
-                // Top 5 ordenados
+                // Lista do ranking ordenada
                 ArrayNode sortedList;
 
                 // Lista dos top 5 menores valores
@@ -140,9 +140,24 @@ public class MainService {
                     sortedList = objectMapper.createArrayNode().addAll(dataList.subList(0, 5));
                 }
 
+                // Limpa a lista dos dados
+                dataList.clear();
+
+                // Enumera os itens do ranking
+                for(int index = 0; index < sortedList.size(); index++) {
+                    ObjectNode node = (ObjectNode) sortedList.get(index);
+
+                    // Adiciona o novo campo "id"
+                    node.put("id", index + 1);
+                    dataList.add(node);
+                }
+
+                // Ranking numerado
+                ArrayNode arrayNode = objectMapper.createArrayNode().addAll(dataList.subList(0, dataList.size()));
+
                 ObjectNode object = objectMapper.createObjectNode();
-                object.put("length", dataList.size());
-                object.set("data", sortedList);
+                object.put("length", length);
+                object.set("data", arrayNode);
 
                 // Retorna os dados em json string
                 return objectMapper.writeValueAsString(object);
