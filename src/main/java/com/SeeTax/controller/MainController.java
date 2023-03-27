@@ -19,11 +19,6 @@ public class MainController {
     @Autowired
     private MainService service;
 
-    @GetMapping(value = "/personal-accounts")
-    public String get() {
-        return service.getPersonalAccount();
-    }
-
     @GetMapping(value = "/ranking")
     public String getRanking() {
         try {

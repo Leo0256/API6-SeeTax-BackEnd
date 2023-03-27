@@ -26,21 +26,14 @@ public class MainService {
     private final String personalAccountsURL = base_uri + "/personal-accounts";
 
     private RestTemplate rest = new RestTemplate();
-    
-    public String getPersonalAccount() {
-        ResponseEntity<PersonalAccount> a = rest.getForEntity(personalAccountsURL, PersonalAccount.class);
-        ObjectMapper objectMapper = new ObjectMapper();
 
-        try {
-            String x = objectMapper.writeValueAsString(a.getBody());
-            return x;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "veio algo";
-        }
-    }
-
-    private Double MinMaxConvert(String value) {
+    /**
+     * Converte o valor informado de string para double.
+     * 
+     * @param value
+     * @return Valor convertido em double
+     */
+    private Double StrToDouble(String value) {
         if(value.equals("NA")) {
             return 0.0;
         }
@@ -88,8 +81,8 @@ public class MainService {
                         for(FeesServices priorityServices : personalAccount.getFees().getPriorityServices()) {
 
                             // Valores máximo e mínimo
-                            Double max = MinMaxConvert(priorityServices.getMaximum().getValue());
-                            Double min = MinMaxConvert(priorityServices.getMinimum().getValue());
+                            Double max = StrToDouble(priorityServices.getMaximum().getValue());
+                            Double min = StrToDouble(priorityServices.getMinimum().getValue());
 
                             // Média dos valores
                             Double media = (max + min)/2;
@@ -97,10 +90,10 @@ public class MainService {
                         }
 
                         // OtherServices
-                        for(FeesServices otheServices : personalAccount.getFees().getOtherServices()) {
+                        for(FeesServices otherServices : personalAccount.getFees().getOtherServices()) {
                             // Valores máximo e mínimo
-                            Double max = MinMaxConvert(otheServices.getMaximum().getValue());
-                            Double min = MinMaxConvert(otheServices.getMinimum().getValue());
+                            Double max = StrToDouble(otherServices.getMaximum().getValue());
+                            Double min = StrToDouble(otherServices.getMinimum().getValue());
 
                             // Média dos valores
                             Double media = (max + min)/2;
