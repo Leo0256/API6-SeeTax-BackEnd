@@ -29,4 +29,14 @@ public class MainController {
         }
     }
 
+    @GetMapping(value = "/tax")
+    public String getTax() {
+        try {
+            return service.getTax();
+        }
+        catch(IOException e) {
+            return e.toString();
+        }
+    }
+
 }

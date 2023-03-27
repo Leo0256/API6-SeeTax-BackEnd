@@ -155,4 +155,95 @@ public class MainService {
             return e.getMessage();
         }
     }
+
+    public String getTax() throws IOException {
+        try {
+            ResponseEntity<PersonalAccount> responseEntity = rest.getForEntity(personalAccountsURL, PersonalAccount.class);
+
+            // Veio os dados do Open Finance
+            if(responseEntity.hasBody() && responseEntity.getBody() != null) {
+
+                // Obtêm os dados
+                PersonalAccount data = responseEntity.getBody();
+
+                // Nenhum dado foi Obtido
+                if(data == null) throw new NullPointerException("Nenhum dado foi Obtido.");
+
+                // Mapeamento dos objetos json
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                // Lista dos dados a serem retornados
+                List<JsonNode> dataList = new ArrayList<>();
+
+                
+
+                for(Companies companie : data.getData().getBrand().getCompanies()) {
+                    for(PersonalAccountList personalAccount : companie.getPersonalAccounts()) {
+
+                        // Lista dos serviços
+                        List<JsonNode> priorityServiceList = new ArrayList<>();
+                        List<JsonNode> otherServiceList = new ArrayList<>();
+
+                        // PriorityServices
+                        for(FeesServices priorityServices : personalAccount.getFees().getPriorityServices()) {
+
+                            // Item do json
+                            ObjectNode childNode = objectMapper.createObjectNode();
+
+                            // Valores máximo e mínimo
+                            Double max = StrToDouble(priorityServices.getMaximum().getValue());
+                            Double min = StrToDouble(priorityServices.getMinimum().getValue());
+
+                            childNode.put("name", priorityServices.getName());
+                            childNode.put("max", max);
+                            childNode.put("min", min);
+
+                            priorityServiceList.add(childNode);
+
+                        }
+
+                        // PriorityServices
+                        for(FeesServices otherServices : personalAccount.getFees().getOtherServices()) {
+
+                            // Item do json
+                            ObjectNode childNode = objectMapper.createObjectNode();
+
+                            // Valores máximo e mínimo
+                            Double max = StrToDouble(otherServices.getMaximum().getValue());
+                            Double min = StrToDouble(otherServices.getMinimum().getValue());
+
+                            childNode.put("name", otherServices.getName());
+                            childNode.put("max", max);
+                            childNode.put("min", min);
+
+                            otherServiceList.add(childNode);
+
+                        }
+
+                        ArrayNode priorityServices = objectMapper.createArrayNode().addAll(priorityServiceList.subList(0, priorityServiceList.size()));
+                        ArrayNode otherServices = objectMapper.createArrayNode().addAll(otherServiceList.subList(0, otherServiceList.size()));
+
+                        ObjectNode companieNode = objectMapper.createObjectNode();
+                        companieNode.put("companie", companie.getName());
+                        companieNode.put("cnpf", companie.getCnpjNumber());
+                        companieNode.put("accountType", personalAccount.getType());
+                        companieNode.set("priorityServices", priorityServices);
+                        companieNode.set("otherServices", otherServices);
+
+                        dataList.add(companieNode);
+                    }
+                }
+
+                return objectMapper.writeValueAsString(dataList);
+
+            }
+            // Não foi possível obter os dados do Open Finance
+            else throw new NullPointerException("Não foi possível obter os dados do Open Finance.");
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+    }
+
 }
