@@ -26,4 +26,13 @@ public class SaveController {
         }
     }
 
+    @GetMapping(value = "/grupos")
+    public void saveGrupos() {
+        try {
+            service.saveGrupos();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
 }
