@@ -12,16 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.SeeTax.entity.InstituicaoGrupo;
-import com.SeeTax.entity.GruposConsolidados.Grupos;
-import com.SeeTax.entity.GruposConsolidados.GruposBody;
-import com.SeeTax.entity.Instituicoes.Instituicoes;
-import com.SeeTax.entity.Instituicoes.InstituicoesBody;
-import com.SeeTax.entity.Servicos.Servicos;
-import com.SeeTax.entity.Servicos.ServicosBody;
-import com.SeeTax.repository.GruposRep;
-import com.SeeTax.repository.InstituicaoGrupoRep;
-import com.SeeTax.repository.InstituicoesRep;
-import com.SeeTax.repository.ServicosRep;
+import com.SeeTax.entity.GruposConsolidados.*;
+import com.SeeTax.entity.Instituicoes.*;
+import com.SeeTax.entity.Servicos.*;
+import com.SeeTax.entity.TarifaInstituicao.*;
+import com.SeeTax.repository.*;
 
 @Service
 public class SaveService {
@@ -44,6 +39,9 @@ public class SaveService {
 
     @Autowired
     private InstituicaoGrupoRep instGrupoRep;
+
+    @Autowired
+    private TarifasInstituicaoRep tarifasInstRep;
 
     /**
      * Salva os serviços no banco de dados.
@@ -204,6 +202,66 @@ public class SaveService {
                 executor.shutdown();
                 while (!executor.isTerminated()) {}
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void saveTarifasInstituicoes() throws Exception {
+        try {
+            String _url = olinda_uri + "Informes_ListaTarifasPorInstituicaoFinanceira/versao/v1/odata/ListaTarifasPorInstituicaoFinanceira";
+            String _url_end = "?$top=100&$format=json";
+
+            List<Instituicoes> instituicoes = instRep.findAll();
+
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(20);
+
+            for (Instituicoes instituicao : instituicoes) {
+                ResponseEntity<TarifasInstituicaoBody> respPessoaF = rest.getForEntity(
+                    _url + "(PessoaFisicaOuJuridica='F',CNPJ='" + instituicao.getCnpj() + "')" + _url_end,
+                    TarifasInstituicaoBody.class
+                );
+
+                if(!respPessoaF.hasBody()) throw new Exception("Falha de acesso aos dados.");
+                
+                TarifasInstituicaoBody tarifasFBody = respPessoaF.getBody();
+                if(tarifasFBody == null) throw new Exception("Falha na requisição dos dados.");
+
+
+                ResponseEntity<TarifasInstituicaoBody> respPessoaJ = rest.getForEntity(
+                    _url + "(PessoaFisicaOuJuridica='J',CNPJ='" + instituicao.getCnpj() + "')" + _url_end,
+                    TarifasInstituicaoBody.class
+                );
+
+                if(!respPessoaJ.hasBody()) throw new Exception("Falha de acesso aos dados.");
+
+                TarifasInstituicaoBody tarifasJBody = respPessoaJ.getBody();
+                if(tarifasJBody == null) throw new Exception("Falha na requisição dos dados.");
+
+
+                List<TarifasInstituicao> tarifasF = tarifasFBody.getTarifas();
+                List<TarifasInstituicao> tarifasJ = tarifasJBody.getTarifas();
+                
+                executor.submit(() -> {
+                    for (TarifasInstituicao tarifa : tarifasF) {
+                        tarifa.setCnpj(instituicao.getCnpj());
+                        tarifa.setPessoa('F');
+
+                        tarifasInstRep.save(tarifa);
+                    }
+
+                    for (TarifasInstituicao tarifa : tarifasJ) {
+                        tarifa.setCnpj(instituicao.getCnpj());
+                        tarifa.setPessoa('J');
+
+                        tarifasInstRep.save(tarifa);
+                    }
+                });
+            }
+
+            executor.shutdown();
 
         } catch (Exception e) {
             e.printStackTrace();
