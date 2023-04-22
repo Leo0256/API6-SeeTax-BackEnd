@@ -35,4 +35,13 @@ public class SaveController {
         }
     }
 
+    @GetMapping(value = "/instituicoes")
+    public void saveInstituicoes() {
+        try {
+            service.saveInstituicoes();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
 }
