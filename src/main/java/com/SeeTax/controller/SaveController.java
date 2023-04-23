@@ -62,4 +62,13 @@ public class SaveController {
         }
     }
 
+    @GetMapping(value = "/tarifas/servicos")
+    public void saveTarifasServicos() {
+        try {
+            service.saveTarifasServicos();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
 }

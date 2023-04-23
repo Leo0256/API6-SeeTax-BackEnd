@@ -16,8 +16,8 @@ import com.SeeTax.entity.GruposConsolidados.*;
 import com.SeeTax.entity.Instituicoes.*;
 import com.SeeTax.entity.Servicos.*;
 import com.SeeTax.entity.TarifaInstituicao.*;
-import com.SeeTax.entity.TarifasValor.TarifasValor;
-import com.SeeTax.entity.TarifasValor.TarifasValorBody;
+import com.SeeTax.entity.TarifasValor.*;
+import com.SeeTax.entity.ValoresServicos.*;
 import com.SeeTax.repository.*;
 
 @Service
@@ -47,6 +47,9 @@ public class SaveService {
 
     @Autowired
     private TarifasValorRep tarifasValorRep;
+
+    @Autowired
+    private ValoresServicosRep vServicosRep;
 
     /**
      * Salva os serviços no banco de dados.
@@ -314,6 +317,74 @@ public class SaveService {
             }
 
             
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void saveTarifasServicos() throws Exception {
+        try {
+
+            List<Grupos> grupos = gruposRep.findAll();
+            
+            String _url = olinda_uri + "Informes_ListaValoresDeServicoBancario/versao/v1/odata/ListaValoresServicoBancario";
+            String _url_end = "?$top=20&$format=json";
+
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(20);
+
+            for (Grupos grupo : grupos) {
+                ResponseEntity<ValoresServicosBody> respPessoaF = rest.getForEntity(
+                    _url + "(PessoaFisicaOuJuridica='F',CodigoGrupoConsolidado='" + grupo.getCodigo() + "')" + _url_end,
+                    ValoresServicosBody.class
+                );
+
+                ResponseEntity<ValoresServicosBody> respPessoaJ = rest.getForEntity(
+                    _url + "(PessoaFisicaOuJuridica='J',CodigoGrupoConsolidado='" + grupo.getCodigo() + "')" + _url_end,
+                    ValoresServicosBody.class
+                );
+
+
+                if(!respPessoaF.hasBody() || !respPessoaJ.hasBody()) throw new Exception("Falha de acesso aos dados.");
+                
+                ValoresServicosBody tarifasFBody = respPessoaF.getBody();
+                ValoresServicosBody tarifasJBody = respPessoaF.getBody();
+
+                if(tarifasFBody == null || tarifasJBody == null) throw new Exception("Falha na requisição dos dados.");
+
+                List<ValoresServicos> vServicosF = tarifasFBody.getServicos();
+                List<ValoresServicos> vServicosJ = tarifasJBody.getServicos();
+
+                executor.submit(() -> {
+                    for (ValoresServicos vServicoF : vServicosF) {
+                        Optional<Servicos> a = servicosRep.findByNome(vServicoF.getNome_servico());
+                        if(a.isPresent() && !a.isEmpty()) {
+                            vServicoF.setCodigo(a.get().getCodigo());
+                            vServicoF.setPessoa('F');
+                            vServicoF.setGrupo(grupo.getCodigo());
+                            
+                            vServicosRep.save(vServicoF);
+                        }
+                    }
+                });
+
+                executor.submit(() -> {
+                    for (ValoresServicos vServicoJ : vServicosJ) {
+                        Optional<Servicos> a = servicosRep.findByNome(vServicoJ.getNome_servico());
+                        if(a.isPresent() && !a.isEmpty()) {
+                            vServicoJ.setCodigo(a.get().getCodigo());
+                            vServicoJ.setPessoa('J');
+                            vServicoJ.setGrupo(grupo.getCodigo());
+
+                            vServicosRep.save(vServicoJ);
+                        }
+                        
+                    }
+                });
+            }
+
+            executor.shutdown();
+
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
