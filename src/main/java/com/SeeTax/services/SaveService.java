@@ -16,6 +16,8 @@ import com.SeeTax.entity.GruposConsolidados.*;
 import com.SeeTax.entity.Instituicoes.*;
 import com.SeeTax.entity.Servicos.*;
 import com.SeeTax.entity.TarifaInstituicao.*;
+import com.SeeTax.entity.TarifasValor.TarifasValor;
+import com.SeeTax.entity.TarifasValor.TarifasValorBody;
 import com.SeeTax.repository.*;
 
 @Service
@@ -42,6 +44,9 @@ public class SaveService {
 
     @Autowired
     private TarifasInstituicaoRep tarifasInstRep;
+
+    @Autowired
+    private TarifasValorRep tarifasValorRep;
 
     /**
      * Salva os serviços no banco de dados.
@@ -263,6 +268,52 @@ public class SaveService {
 
             executor.shutdown();
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void saveTarifasValor() throws Exception {
+        try {
+
+            List<Grupos> grupos = gruposRep.findAll();
+            List<Servicos> servicos = servicosRep.findAll();
+
+            String _url = olinda_uri + "Informes_ListaTarifaPorValores/versao/v1/odata/ListaTarifasPorValores";
+            String _url_end = "?$top=20&$format=json";
+
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(20);
+
+            for (Grupos grupo : grupos) {
+                for (Servicos servico : servicos) {
+
+                    ResponseEntity<TarifasValorBody> resp = rest.getForEntity(
+                        _url + "(CodigoGrupoConsolidado='" + grupo.getCodigo() +
+                        "',CodigoServico='" + servico.getCodigo() + "')" + _url_end,
+                        TarifasValorBody.class
+                    );
+
+                    if(!resp.hasBody()) throw new Exception("Falha de acesso aos dados.");
+
+                    TarifasValorBody body = resp.getBody();
+
+                    if(body == null) throw new Exception("Falha na requisição dos dados.");
+
+                    List<TarifasValor> tarifas = body.getTarifas();
+
+                    executor.submit(() -> {
+                        for (TarifasValor tarifa : tarifas) {
+                            tarifa.setCodigo(servico.getCodigo());
+                            tarifa.setGrupo(grupo.getCodigo());
+
+                            tarifasValorRep.save(tarifa);
+                        }
+                    });
+                }
+            }
+
+            
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
