@@ -1,5 +1,6 @@
 package com.SeeTax.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,33 @@ public class TarifasService {
 
     public List<ValoresServicos> getTarifasServicos() {
         return vServicosRep.findAll();
+    }
+
+    public List<ValoresServicos> getComparadorTarifas(List<String> grupos, List<String> servicos) {
+        List<ValoresServicos> valores = vServicosRep.findAll();
+        List<ValoresServicos> filter = new ArrayList<>();
+
+        // Possui grupos para filtrar
+        if(grupos.size() > 0) {
+            for (ValoresServicos valoresServico : valores) {
+                // Filtra por grupo
+                if(grupos.contains(valoresServico.getGrupo())) {
+                    filter.add(valoresServico);
+                }
+            }
+        }
+        // Sem filtro por grupo
+        else {
+            filter.addAll(valores);
+        }
+
+        // Possui serviços para filtrar
+        if(servicos.size() > 0) {
+            return filter.stream().filter(a -> servicos.contains(a.getCodigo())).toList();
+        }
+
+        // Sem filtro por serviços
+        return filter;
     }
     
 }

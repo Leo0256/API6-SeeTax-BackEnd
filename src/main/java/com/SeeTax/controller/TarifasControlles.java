@@ -1,12 +1,17 @@
 package com.SeeTax.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.SeeTax.entity.TarifaInstituicao.TarifasInstituicao;
@@ -16,7 +21,11 @@ import com.SeeTax.services.TarifasService;
 
 @RestController
 @CrossOrigin
-@RequestMapping(value = "/tarifas", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(
+    value = "/tarifas",
+    produces = MediaType.APPLICATION_JSON_VALUE,
+    consumes = {MediaType.APPLICATION_JSON_VALUE}
+)
 public class TarifasControlles {
     
     @Autowired
@@ -35,5 +44,14 @@ public class TarifasControlles {
     @GetMapping(value = "/servicos")
     public List<ValoresServicos> getTarifasServicos() {
         return service.getTarifasServicos();
+    }
+
+    
+    @PostMapping(value = "/comparador")
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
+    public List<ValoresServicos> getComparadorTarifas(
+        @RequestBody Map<String, List<String>> data
+    ) {
+        return service.getComparadorTarifas(data.get("grupos"), data.get("servicos"));
     }
 }
