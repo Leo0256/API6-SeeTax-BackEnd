@@ -391,4 +391,8 @@ public class SaveService {
         }
     }
 
+    /* public void saveTarifasInstituicao() throws Exception {
+
+    } */
+
 }
