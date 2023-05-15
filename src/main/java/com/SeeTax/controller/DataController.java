@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.SeeTax.entity.GruposConsolidados.Grupos;
-import com.SeeTax.entity.Instituicoes.Instituicoes;
+import com.SeeTax.entity.Instituicoes.Instituicao;
 import com.SeeTax.entity.Servicos.Servicos;
 import com.SeeTax.services.DataService;
 
@@ -28,7 +28,7 @@ public class DataController {
     }
 
     @GetMapping(value = "/instituicoes")
-    public List<Instituicoes> getInstituicoes() {
+    public List<Instituicao> getInstituicoes() {
         return service.getInstituicoes();
     }
 

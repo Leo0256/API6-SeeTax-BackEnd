@@ -1,5 +1,7 @@
 package com.SeeTax.entity.TarifasValor;
 
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -39,6 +41,24 @@ public class TarifasValor {
     @Column(name = "periodicidade")
     @JsonProperty("Periodicidade")
     private String periodicidade;
+
+    @Column(name = "pessoa")
+    private Character pessoa;
+
+    @Column(name = "data")
+    private Date data;
+
+    public TarifasValor(int id, String grupo, String cnpj, String codigo, float valor_max, String periodicidade,
+        Character pessoa, Date data) {
+        this.id = id;
+        this.grupo = grupo;
+        this.cnpj = cnpj;
+        this.codigo = codigo;
+        this.valor_max = valor_max;
+        this.periodicidade = periodicidade;
+        this.pessoa = pessoa;
+        this.data = data;
+    }
 
     public TarifasValor(int id, String grupo, String cnpj, String codigo, String razao_social, float valor_max,
             String periodicidade) {
@@ -107,6 +127,22 @@ public class TarifasValor {
 
     public void setPeriodicidade(String periodicidade) {
         this.periodicidade = periodicidade;
+    }
+
+    public Character getPessoa() {
+        return pessoa;
+    }
+
+    public void setPessoa(Character pessoa) {
+        this.pessoa = pessoa;
+    }
+
+    public Date getData() {
+        return data;
+    }
+
+    public void setData(Date data) {
+        this.data = data;
     }
 
 }

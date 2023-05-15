@@ -10,9 +10,9 @@ public class InstituicoesBody {
     private String context;
 
     @JsonProperty("value")
-    private List<Instituicoes> instituicoes;
+    private List<Instituicao> instituicoes;
 
-    public InstituicoesBody(String context, List<Instituicoes> instituicoes) {
+    public InstituicoesBody(String context, List<Instituicao> instituicoes) {
         this.context = context;
         this.instituicoes = instituicoes;
     }
@@ -27,11 +27,11 @@ public class InstituicoesBody {
         this.context = context;
     }
 
-    public List<Instituicoes> getInstituicoes() {
+    public List<Instituicao> getInstituicoes() {
         return instituicoes;
     }
 
-    public void setInstituicoes(List<Instituicoes> instituicoes) {
+    public void setInstituicoes(List<Instituicao> instituicoes) {
         this.instituicoes = instituicoes;
     }
 

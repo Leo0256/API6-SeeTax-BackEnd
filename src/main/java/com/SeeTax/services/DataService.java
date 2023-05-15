@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.SeeTax.entity.GruposConsolidados.Grupos;
-import com.SeeTax.entity.Instituicoes.Instituicoes;
+import com.SeeTax.entity.Instituicoes.Instituicao;
 import com.SeeTax.entity.Servicos.Servicos;
 import com.SeeTax.repository.GruposRep;
 import com.SeeTax.repository.InstituicoesRep;
@@ -28,7 +28,7 @@ public class DataService {
         return gruposRep.findAll();
     }
 
-    public List<Instituicoes> getInstituicoes() {
+    public List<Instituicao> getInstituicoes() {
         return instRep.findAll();
     }
 

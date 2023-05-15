@@ -4,20 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "instituicoes")
-public class Instituicoes {
+@Table(name = "instituicao")
+public class Instituicao {
     
     @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
     @Column(name = "cnpj", unique = true)
     @JsonProperty("Cnpj")
     private String cnpj;
@@ -26,13 +20,12 @@ public class Instituicoes {
     @JsonProperty("Nome")
     private String nome;
 
-    public Instituicoes(int id, String cnpj, String nome) {
-        this.id = id;
+    public Instituicao(String cnpj, String nome) {
         this.cnpj = cnpj;
         this.nome = nome;
     }
 
-    public Instituicoes() {}
+    public Instituicao() {}
 
     public String getCnpj() {
         return cnpj;
@@ -48,14 +41,6 @@ public class Instituicoes {
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
 }

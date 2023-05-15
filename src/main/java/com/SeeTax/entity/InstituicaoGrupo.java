@@ -1,7 +1,7 @@
 package com.SeeTax.entity;
 
 import com.SeeTax.entity.GruposConsolidados.Grupos;
-import com.SeeTax.entity.Instituicoes.Instituicoes;
+import com.SeeTax.entity.Instituicoes.Instituicao;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -27,10 +27,10 @@ public class InstituicaoGrupo {
     private Grupos grupo;
 
     @ManyToOne(cascade = CascadeType.DETACH)
-    @JoinColumn(name = "inst")
-    private Instituicoes instituicao;
+    @JoinColumn(name = "cnpj", referencedColumnName = "cnpj")
+    private Instituicao instituicao;
 
-    public InstituicaoGrupo(int id, Grupos grupo, Instituicoes instituicao) {
+    public InstituicaoGrupo(int id, Grupos grupo, Instituicao instituicao) {
         this.id = id;
         this.grupo = grupo;
         this.instituicao = instituicao;
@@ -54,11 +54,11 @@ public class InstituicaoGrupo {
         this.grupo = grupo;
     }
 
-    public Instituicoes getInstituicao() {
+    public Instituicao getInstituicao() {
         return instituicao;
     }
 
-    public void setInstituicao(Instituicoes instituicao) {
+    public void setInstituicao(Instituicao instituicao) {
         this.instituicao = instituicao;
     }
 
