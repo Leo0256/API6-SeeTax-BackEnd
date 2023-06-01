@@ -1,7 +1,12 @@
 def previsao_tarifas(dados):
     from sklearn.linear_model import LinearRegression 
+    regressor = LinearRegression()
 
-    from sklearn.model_selection import train_test_split 
+    valores = []
+    datas = []
+    for a in dados:
+        valores.append(a['valor_max'])
+        datas.append(a['data'])
 
-    from sklearn import metrics 
-    return dados
+    regressor.fit(valores, datas)
+    return regressor.predict(valores)
