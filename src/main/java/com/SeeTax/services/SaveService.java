@@ -1,7 +1,11 @@
 package com.SeeTax.services;
 
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -10,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.SeeTax.entity.InstituicaoGrupo;
 import com.SeeTax.entity.GruposConsolidados.*;
 import com.SeeTax.entity.Instituicoes.*;
 import com.SeeTax.entity.Servicos.*;
@@ -40,9 +44,6 @@ public class SaveService {
     private InstituicoesRep instRep;
 
     @Autowired
-    private InstituicaoGrupoRep instGrupoRep;
-
-    @Autowired
     private TarifasInstituicaoRep tarifasInstRep;
 
     @Autowired
@@ -58,7 +59,7 @@ public class SaveService {
      */
     public Boolean saveServicos() throws Exception {
         try {
-            String servicos_url = tarifaPorValor_url + "ServicosBancarios?$top=10000&$format=json";
+            String servicos_url = tarifaPorValor_url + "ServicosBancarios?$top=200&$format=json";
 
             ResponseEntity<ServicosBody> responseEntity = rest.getForEntity(
                 servicos_url,
@@ -150,70 +151,25 @@ public class SaveService {
      * 
      * @throws Exception
      */
-    public void saveInstituicoes() throws Exception {
-        try {
+    public void saveInst(MultipartFile multipartFile) throws Exception {
+        File file = File.createTempFile("temp", ".temp");
+        file.createNewFile();
+        multipartFile.transferTo(Paths.get(file.getAbsolutePath()));
 
-            // Grupos consolidados
-            List<Grupos> grupos = gruposRep.findAll();
+        List<Instituicao> list = new ArrayList<>();
 
-            // URL dos dados das instituições
-            String _url = olinda_uri + "Informes_ListaTarifasPorInstituicaoFinanceira/versao/v1/odata/ListaInstituicoesDeGrupoConsolidado";
-            String _url_end = "?$top=20&$format=json";
+        try(Scanner scanner = new Scanner(Paths.get(file.getAbsolutePath()))) {
+            scanner.nextLine();
 
-            for (Grupos grupo : grupos) {
-                // Código do grupo consolidado
-                String grupoCodigo = grupo.getCodigo();
-
-                ResponseEntity<InstituicoesBody> resp = rest.getForEntity(
-                    _url + "(CodigoGrupoConsolidado='" + grupoCodigo + "')" + _url_end,
-                    InstituicoesBody.class
-                );
-
-                if(!resp.hasBody()) throw new Exception("Falha de acesso aos dados.");
-
-                InstituicoesBody body = resp.getBody();
-
-                if(body == null) throw new Exception("Falha na requisição dos dados.");
-
-                // Instituições
-                List<Instituicoes> instituicoes = body.getInstituicoes();
-
-                ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(20);
-
-                // Salva as instituições
-                for (Instituicoes instituicao : instituicoes) {
-                    executor.submit(() -> {
-                        Optional<Instituicoes> opInstituicao = instRep.findByCnpj(instituicao.getCnpj());
-                        InstituicaoGrupo instGrupo = new InstituicaoGrupo();
-
-                        instGrupo.setGrupo(grupo);
-
-                        if(opInstituicao.isEmpty()) {
-                            Instituicoes aux = instRep.save(instituicao);
-                            instGrupo.setInstituicao(aux);
-                        }
-                        else {
-                            instGrupo.setInstituicao(opInstituicao.get());
-                        }
-
-
-                        Optional<InstituicaoGrupo> opInstGrupo = instGrupoRep.find(
-                            instGrupo.getGrupo(),
-                            instGrupo.getInstituicao()
-                        );
-                        if(opInstGrupo.isEmpty()) {
-                            instGrupoRep.save(instGrupo);
-                        }
-                    });
-                }
-
-                executor.shutdown();
-                while (!executor.isTerminated()) {}
+            while(scanner.hasNextLine()) {
+                String[] lineArray = scanner.nextLine().split(";");
+                list.add(new Instituicao(
+                    lineArray[0],
+                    lineArray[1]
+                ));
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
+            instRep.saveAll(list);
         }
     }
 
@@ -222,11 +178,11 @@ public class SaveService {
             String _url = olinda_uri + "Informes_ListaTarifasPorInstituicaoFinanceira/versao/v1/odata/ListaTarifasPorInstituicaoFinanceira";
             String _url_end = "?$top=100&$format=json";
 
-            List<Instituicoes> instituicoes = instRep.findAll();
+            List<Instituicao> instituicoes = instRep.findAll();
 
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(20);
 
-            for (Instituicoes instituicao : instituicoes) {
+            for (Instituicao instituicao : instituicoes) {
                 ResponseEntity<TarifasInstituicaoBody> respPessoaF = rest.getForEntity(
                     _url + "(PessoaFisicaOuJuridica='F',CNPJ='" + instituicao.getCnpj() + "')" + _url_end,
                     TarifasInstituicaoBody.class
@@ -271,52 +227,6 @@ public class SaveService {
 
             executor.shutdown();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-    public void saveTarifasValor() throws Exception {
-        try {
-
-            List<Grupos> grupos = gruposRep.findAll();
-            List<Servicos> servicos = servicosRep.findAll();
-
-            String _url = olinda_uri + "Informes_ListaTarifaPorValores/versao/v1/odata/ListaTarifasPorValores";
-            String _url_end = "?$top=20&$format=json";
-
-            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(20);
-
-            for (Grupos grupo : grupos) {
-                for (Servicos servico : servicos) {
-
-                    ResponseEntity<TarifasValorBody> resp = rest.getForEntity(
-                        _url + "(CodigoGrupoConsolidado='" + grupo.getCodigo() +
-                        "',CodigoServico='" + servico.getCodigo() + "')" + _url_end,
-                        TarifasValorBody.class
-                    );
-
-                    if(!resp.hasBody()) throw new Exception("Falha de acesso aos dados.");
-
-                    TarifasValorBody body = resp.getBody();
-
-                    if(body == null) throw new Exception("Falha na requisição dos dados.");
-
-                    List<TarifasValor> tarifas = body.getTarifas();
-
-                    executor.submit(() -> {
-                        for (TarifasValor tarifa : tarifas) {
-                            tarifa.setCodigo(servico.getCodigo());
-                            tarifa.setGrupo(grupo.getCodigo());
-
-                            tarifasValorRep.save(tarifa);
-                        }
-                    });
-                }
-            }
-
-            
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -391,8 +301,57 @@ public class SaveService {
         }
     }
 
-    /* public void saveTarifasInstituicao() throws Exception {
+    public void saveTarifasValor(MultipartFile multipartfile) throws Exception {
+        if(multipartfile != null) {
+            File file = File.createTempFile("temp", ".tmp");
+            file.createNewFile();
+            multipartfile.transferTo(Paths.get(file.getAbsolutePath()));
 
-    } */
+            try(Scanner scanner = new Scanner(Paths.get(file.getAbsolutePath()))) {
+                
+                for(int a = 0; a < 1; a++) scanner.nextLine();
+
+                ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+
+                while(scanner.hasNextLine()) {
+                    String[] lineArray = scanner.nextLine().split(";");
+
+                    executor.submit(() -> {
+                        TarifasValor tarifaValor = new TarifasValor();
+
+                        String cnpj = lineArray[3].trim();
+                        while(cnpj.length() < 8) {
+                            cnpj = "0" + cnpj;
+                        }
+                        
+                        tarifaValor.setCnpj(cnpj);
+                        tarifaValor.setCodigo(lineArray[1].trim().replace(".", ""));
+                        tarifaValor.setPeriodicidade(lineArray[6].trim());
+                        tarifaValor.setPessoa(lineArray[7].trim().toCharArray()[0]);
+                        tarifaValor.setValor_max(Float.parseFloat(
+                            lineArray[5].trim()
+                            .replaceAll("\\.", "")
+                            .replaceAll("\\,", ".")
+                        ));
+                        
+
+                        tarifaValor.setData(lineArray[0].trim());
+
+                        tarifasValorRep.save(tarifaValor);
+                    });
+                }
+
+                scanner.close();
+
+                executor.shutdown();
+                while (!executor.isTerminated()) {}
+            }
+            catch(Exception e) {
+                e.getStackTrace();
+                System.out.print(e);
+            }
+        }
+        else throw new Exception("Nenhum arquivo informado");
+    }
 
 }

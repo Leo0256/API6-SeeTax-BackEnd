@@ -1,7 +1,5 @@
 package com.SeeTax.entity.TarifasValor;
 
-import java.util.Date;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -19,9 +17,6 @@ public class TarifasValor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
-    @Column(name = "grupo")
-    private String grupo;
 
     @Column(name = "cnpj")
     @JsonProperty("Cnpj")
@@ -46,12 +41,11 @@ public class TarifasValor {
     private Character pessoa;
 
     @Column(name = "data")
-    private Date data;
+    private String data;
 
-    public TarifasValor(int id, String grupo, String cnpj, String codigo, float valor_max, String periodicidade,
-        Character pessoa, Date data) {
+    public TarifasValor(int id, String cnpj, String codigo, float valor_max, String periodicidade,
+        Character pessoa, String data) {
         this.id = id;
-        this.grupo = grupo;
         this.cnpj = cnpj;
         this.codigo = codigo;
         this.valor_max = valor_max;
@@ -60,10 +54,9 @@ public class TarifasValor {
         this.data = data;
     }
 
-    public TarifasValor(int id, String grupo, String cnpj, String codigo, String razao_social, float valor_max,
+    public TarifasValor(int id, String cnpj, String codigo, String razao_social, float valor_max,
             String periodicidade) {
         this.id = id;
-        this.grupo = grupo;
         this.cnpj = cnpj;
         this.codigo = codigo;
         this.razao_social = razao_social;
@@ -79,14 +72,6 @@ public class TarifasValor {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getGrupo() {
-        return grupo;
-    }
-
-    public void setGrupo(String grupo) {
-        this.grupo = grupo;
     }
 
     public String getCnpj() {
@@ -137,11 +122,11 @@ public class TarifasValor {
         this.pessoa = pessoa;
     }
 
-    public Date getData() {
+    public String getData() {
         return data;
     }
 
-    public void setData(Date data) {
+    public void setData(String data) {
         this.data = data;
     }
 

@@ -1,9 +1,7 @@
 package com.SeeTax.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,10 +39,11 @@ public class SaveController {
         }
     }
 
-    @GetMapping(value = "/instituicoes")
-    public void saveInstituicoes() {
+    @PostMapping(value = "/instituicao")
+    @ResponseBody
+    public void saveInstituicoes(@RequestParam("file") MultipartFile multipartFile) {
         try {
-            service.saveInstituicoes();
+            service.saveInst(multipartFile);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -54,15 +53,6 @@ public class SaveController {
     public void saveTarifasInstituicoes() {
         try {
             service.saveTarifasInstituicoes();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
-
-    @GetMapping(value = "/tarifas/valor")
-    public void saveTarifasValor() {
-        try {
-            service.saveTarifasValor();
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -79,15 +69,13 @@ public class SaveController {
 
     @PostMapping(value = "/tarifas/inst")
     @ResponseBody
-    public ResponseEntity<String> saveTarifasInstituicao(@RequestParam("file") MultipartFile file) {
-        System.out.println("alsoioioif");
+    public void saveTarifasInstituicao(
+        @RequestParam("file") MultipartFile multipartfile
+    ) {
         try {
-            //service.saveTarifasInstituicao();
-            System.out.println(String.valueOf(file != null).toString());
-            return new ResponseEntity<>(String.valueOf(file != null).toString(), HttpStatus.OK);
+            service.saveTarifasValor(multipartfile);
         } catch (Exception e) {
             System.out.println(e);
-            return new ResponseEntity<>("zebra", HttpStatus.BAD_REQUEST);
         }
     }
 
