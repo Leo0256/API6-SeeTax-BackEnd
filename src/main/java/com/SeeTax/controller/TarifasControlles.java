@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.SeeTax.entity.Ranking;
 import com.SeeTax.entity.TarifaInstituicao.TarifasInstituicao;
 import com.SeeTax.entity.TarifasValor.TarifasValor;
 import com.SeeTax.entity.ValoresServicos.ValoresServicos;
@@ -24,7 +26,7 @@ import com.SeeTax.services.TarifasService;
 @RequestMapping(
     value = "/tarifas",
     produces = MediaType.APPLICATION_JSON_VALUE,
-    consumes = {MediaType.APPLICATION_JSON_VALUE}
+    consumes = {MediaType.ALL_VALUE}
 )
 public class TarifasControlles {
     
@@ -53,5 +55,10 @@ public class TarifasControlles {
         @RequestBody Map<String, List<String>> data
     ) {
         return service.getComparadorTarifas(data.get("grupos"), data.get("servicos"));
+    }
+
+    @GetMapping(value = "/ranking")
+    public List<Ranking> getRanking(@RequestParam("servico") String servico) {
+        return service.getRanking(servico);
     }
 }
