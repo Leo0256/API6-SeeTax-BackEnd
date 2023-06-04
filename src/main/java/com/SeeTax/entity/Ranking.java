@@ -1,7 +1,5 @@
 package com.SeeTax.entity;
 
-import java.util.List;
-
 import com.SeeTax.entity.TarifaInstituicao.TarifasInstituicao;
 
 public class Ranking {

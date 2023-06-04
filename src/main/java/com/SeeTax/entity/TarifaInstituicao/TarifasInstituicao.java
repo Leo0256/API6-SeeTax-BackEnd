@@ -55,8 +55,11 @@ public class TarifasInstituicao {
     @JsonProperty("Periodicidade")
     private String periodicidade;
 
+    @Column(name = "inst_nome")
+    private String inst_nome;
+
     public TarifasInstituicao(int id, String codigo, String servico, String cnpj, Character pessoa, String unidade,
-            Date data_vigencia, float valor_max, String valor_tipo, String periodicidade) {
+            Date data_vigencia, float valor_max, String valor_tipo, String periodicidade, String inst_nome) {
         this.id = id;
         this.codigo = codigo;
         this.servico = servico;
@@ -67,6 +70,7 @@ public class TarifasInstituicao {
         this.valor_max = valor_max;
         this.valor_tipo = valor_tipo;
         this.periodicidade = periodicidade;
+        this.inst_nome = inst_nome;
     }
 
     public TarifasInstituicao() {}
@@ -149,6 +153,14 @@ public class TarifasInstituicao {
 
     public void setServico(String servico) {
         this.servico = servico;
+    }
+    
+    public String getInst_nome() {
+        return inst_nome;
+    }
+
+    public void setInst_nome(String inst_nome) {
+        this.inst_nome = inst_nome;
     }
 
 }
