@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.SeeTax.entity.Previsao;
 import com.SeeTax.entity.Ranking;
 import com.SeeTax.entity.TarifaInstituicao.TarifasInstituicao;
 import com.SeeTax.entity.TarifasValor.TarifasValor;
@@ -60,5 +61,15 @@ public class TarifasControlles {
     @GetMapping(value = "/ranking")
     public List<Ranking> getRanking(@RequestParam("servico") String servico) {
         return service.getRanking(servico);
+    }
+
+    @PostMapping(value = "/previsao")
+    public List<Previsao> getPrevisao(@RequestBody Map<String, String> data) {
+        try {
+            return service.getPrevisao(data.get("cnpj"), data.get("servico"));
+        }
+        catch(Exception e) {
+            return null;
+        }
     }
 }
