@@ -109,37 +109,41 @@ public class TarifasService {
     
             String strOutput = null;
             List<Previsao> list = new ArrayList<>();
+
+            if(tarifas.size() != 0) {
     
-            tarifas.forEach(tarifa -> {
-                list.add(new Previsao(
-                    tarifa.getData(),
-                    String.valueOf(tarifa.getValor_max())
-                ));
-            });
+                tarifas.forEach(tarifa -> {
+                    list.add(new Previsao(
+                        tarifa.getData(),
+                        String.valueOf(tarifa.getValor_max())
+                    ));
+                });
 
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-            String data = mapper.writeValueAsString(list)
-                .replace("\r\n", "").replace(" ", "").replace("\"", "'");
-            String model = "src/main/java/com/SeeTax/modelo.py";
+                String data = mapper.writeValueAsString(list)
+                    .replace("\r\n", "").replace(" ", "").replace("\"", "'");
+                String model = "src/main/java/com/SeeTax/modelo.py";
 
-            Process process = Runtime.getRuntime().exec("python " + model + " " + data);
+                Process process = Runtime.getRuntime().exec("python " + model + " " + data);
 
-            BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+                BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
-            while((strOutput = stdInput.readLine()) != null) {
-                System.out.println(strOutput);
-                list.add(mapper.readValue(strOutput.replace("\'", "\""), Previsao.class));
-            }
-
-            if(stdError.readLine() != null) {
-                String e = "";
-                while((strOutput = stdError.readLine()) != null) {
-                    e.concat(strOutput);
+                while((strOutput = stdInput.readLine()) != null) {
+                    System.out.println(strOutput);
+                    list.add(mapper.readValue(strOutput.replace("\'", "\""), Previsao.class));
                 }
-                throw new Exception(e);
+
+                if(stdError.readLine() != null) {
+                    String e = "";
+                    while((strOutput = stdError.readLine()) != null) {
+                        e.concat(strOutput);
+                        System.out.println(strOutput);
+                    }
+                    throw new Exception(e);
+                }
             }
 
             return list;
